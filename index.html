@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Document</title>
+</head>
+<body onload="startGame()">
+    <div id="text">
+        <h1>Zombie Survival Game</h1>
+    </div>
+    <script>
+        var player;
+        var cooldownIndicator;
+        var dir = new Vec2();
+        var atkCooldown = -1;
+        var fCount = 1;
+        var zAmount = 1;
+        var wCooldown = 50;
+        var oWCooldown = 50;
+        var score = 0;
+
+        var zombies = [];
+        
+        /* Shorthand functions */
+        function key(keyCode){
+            if (scene.keys && scene.keys[keyCode]) {return true;}
+            else {return false;}
+        }
+
+        function clamp(input, min, max){
+            return Math.min(Math.max(input, min), max);
+        }
+
+        function iClamp(input, min, max){
+            if (input >= min && input <= max){
+                if (input >= max / 2){return max;}
+                else {return min;}
+            }
+            else {
+                return input;
+            }
+        }
+
+        function randomInt(min, max){
+            return Math.floor(Math.random() * (max - min + 1) + min);
+        }
+
+        function Vec2(x, y) {
+            this.x = x != null ? x : 0;
+            this.y = y != null ? y : 0;
+        }
+
+        /* Engine Code */
+        function component(width, height, color, x, y) {
+            this.width = width;
+            this.height = height;
+            this.x = x;
+            this.y = y;
+            this.update = function() {
+                ctx = scene.context;
+                ctx.fillStyle = color;
+                ctx.fillRect(this.x, this.y, this.width, this.height);
+            }
+        }
+
+        function zombie(width, height, color, x, y, move, index) {
+            this.width = width;
+            this.height = height;
+            this.x = x;
+            this.y = y;
+            this.update = function() {
+                ctx = scene.context;
+                ctx.fillStyle = color;
+                ctx.fillRect(this.x, this.y, this.width, this.height);
+
+                this.move = new Vec2();
+                if (this.x > player.x){this.x -= 1;}
+                if (this.x < player.x){this.x += 1;}
+                if (this.y > player.y){this.y -= 1;}
+                if (this.y < player.y){this.y += 1;}
+
+                this.move.x *= Math.random();
+                this.move.y *= Math.random();
+
+                this.x += this.move.x
+                this.y += this.move.y
+
+                if ((atkCooldown >= 20) && (this.x >= sword.x && this.x <= sword.x + 90) && (this.y >= sword.y && this.y <= sword.y + 90)){
+                    zombies[index] = false;
+                    score += 1;
+                }
+                if ((this.x >= player.x && this.x <= player.x + 30) && (this.y >= player.y && this.y <= player.y + 30)){scene.gameOver();}
+            }
+        }
+
+        var scene = {
+            canvas : document.createElement("canvas"),
+            start : function() {
+                this.canvas.width = 500;
+                this.canvas.height = 500;
+                this.context = this.canvas.getContext("2d");
+                document.body.append(this.canvas, document.body.childNodes[0]);
+                this.interval = setInterval(updateScene, 20);
+                window.addEventListener('keydown', function (e) {
+                    scene.keys = (scene.keys || []);
+                    scene.keys[e.keyCode] = true;
+                })
+                window.addEventListener('keyup', function (e) {
+                    scene.keys[e.keyCode] = false;
+                })
+            },
+            clear : function() {
+                this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            },
+            drawtext : function(text, x, y) {
+                this.context.fillStyle = "Red";
+                this.context.font = "bold 16px Arial";
+                ctx.textAlign = 'center';
+                ctx. textBaseline = 'middle';
+                this.context.fillText(text, x, y);
+            },
+            gameOver : function(){
+                clearInterval(this.interval);
+
+                this.clear();
+
+                this.context.fillStyle = "Red";
+                this.context.font = "bold 24px Arial";
+                ctx.textAlign = 'center';
+                ctx. textBaseline = 'middle';
+                this.context.fillText("Game Over!",250,24);
+            }
+        }
+
+        /* Game Code */
+        function updateScene() {
+            scene.clear();
+
+            fCount += 1
+            if (fCount > 50){fCount = 1;}
+            
+            console.log(fCount);
+
+            /* Zombie Code */
+
+            wCooldown -= 1;
+            if (fCount == 50 && wCooldown <= 0){
+                wCooldown = oWCooldown * 1.25;
+                oWCooldown = wCooldown
+                spawnZombie(Math.floor(zAmount));
+                zAmount += 0.1 * zAmount ^ 1.5;
+            }
+
+            console.log(zAmount);
+
+            /* Player Code */
+
+            atkCooldown = clamp(atkCooldown - 1, 0, 100)
+
+            movement = new Vec2();
+            speed = 5;
+
+            if (key(87)){movement.y -= 1;}
+            if (key(83)){movement.y += 1;}
+            if (key(65)){movement.x -= 1;}
+            if (key(68)){movement.x += 1;}
+
+            player.x += movement.x * speed;
+            player.y += movement.y * speed;
+
+            if (movement.x != 0 || movement.y != 0){dir = movement;}
+
+            if (key(32) && atkCooldown <= 0){
+                atkCooldown = 30;
+                playerAttack(dir);
+            }
+
+            player.x = clamp(player.x, 0, 470)
+            player.y = clamp(player.y, 0, 470)
+
+            cooldownIndicator.height = 30 - atkCooldown;
+
+            cooldownIndicator.x = player.x + 32
+            cooldownIndicator.y = player.y + atkCooldown;
+
+            /* Update Functions */
+            if (atkCooldown >= 20){sword.update();}
+            player.update();
+            cooldownIndicator.update();
+            zombies.forEach(renderZombies);
+
+            scene.drawtext("Next Wave: " + (Math.floor(wCooldown / 50) + 1), 250, 250);
+            scene.drawtext("Score: " + score, 250, 275);
+        }
+
+        function renderZombies(value, index, array){
+            if (value != false){value.update();}
+        }
+
+        function playerAttack(dir){
+            sword = new component(90,90, "blue", (player.x - 30) + dir.x * 45, (player.y - 30) + dir.y * 45);
+        }
+
+        function spawnZombie(amount){
+            for (let i = 1; i <= amount; i++){
+                x = iClamp((randomInt(-100,600)), -30, 500);
+                y = iClamp((randomInt(-100,600)), -30, 500);
+
+                zombies.push(new zombie(30, 30, "green", x, y, new Vec2(), zombies.length));
+            }
+        }
+
+        function startGame() {
+            player = new component(30, 30, "red", 235, 235);
+            cooldownIndicator = new component(2, 30, "blue", 267, 235)
+            scene.start();
+        }
+    </script>
+</body>
+</html>
