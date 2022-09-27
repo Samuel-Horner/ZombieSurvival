@@ -90,7 +90,7 @@
                 this.x += this.move.x
                 this.y += this.move.y
 
-                if ((atkCooldown >= 20) && (this.x >= sword.x && this.x <= sword.x + 90) && (this.y >= sword.y && this.y <= sword.y + 90)){
+                if ((atkCooldown >= 20) && (((this.x >= sword.x && this.x <= sword.x + 90) && (this.y >= sword.y && this.y <= sword.y + 90))||((this.x + 30 >= sword.x && this.x + 30 <= sword.x + 90) && (this.y + 30 >= sword.y && this.y + 30 <= sword.y + 90)))){
                     zombies[index] = false;
                     score += 1;
                 }
@@ -151,7 +151,7 @@
                 wCooldown = clamp(oWCooldown * 1.25, 0, 500);
                 oWCooldown = wCooldown
                 spawnZombie(Math.floor(zAmount));
-                zAmount += 0.1 * zAmount ^ 1.5;
+                zAmount += 0.1 * zAmount ^ 2;
             }
 
             console.log(zAmount);
