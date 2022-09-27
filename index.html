@@ -16,7 +16,7 @@
     <script>
         var player;
         var cooldownIndicator;
-        var dir = new Vec2();
+        var dir = new Vec2(0,1,0);
         var atkCooldown = -1;
         var fCount = 1;
         var zAmount = 1;
@@ -87,8 +87,8 @@
                 this.move.x *= Math.random();
                 this.move.y *= Math.random();
 
-                this.x += this.move.x
-                this.y += this.move.y
+                this.x += this.move.x * (10 + Math.random());
+                this.y += this.move.x * (10 + Math.random());
 
                 if ((atkCooldown >= 20) && (((this.x >= sword.x && this.x <= sword.x + 90) && (this.y >= sword.y && this.y <= sword.y + 90))||((this.x + 30 >= sword.x && this.x + 30 <= sword.x + 90) && (this.y + 30 >= sword.y && this.y + 30 <= sword.y + 90)))){
                     zombies[index] = false;
