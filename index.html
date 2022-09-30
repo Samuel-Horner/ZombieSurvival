@@ -25,6 +25,7 @@
         var wCooldown = 50;
         var oWCooldown = 50;
         var score = 0;
+        var waveCounter = 0;
 
         var zombies = [];
         
@@ -170,15 +171,17 @@
 
             wCooldown -= 1;
             if (fCount == 50 && wCooldown <= 0){
+                waveCounter += 1;
                 wCooldown = clamp(oWCooldown * 1.25, 0, 500);
                 oWCooldown = wCooldown
                 spawnZombie(Math.floor(zAmount));
                 //zAmount += 0.1 * zAmount ^ 2;
-                zAmount *= 1.75;
+                //zAmount *= 1.75;
+                zAmount = waveCounter * 2;
                 if(zAmount >= 400.0){zAmount = 400.0;}
             }
 
-            console.log(zAmount);
+            //console.log(zAmount);
 
             /* Player Code */
 
@@ -218,8 +221,8 @@
 
             //scene.drawtext("Next Wave: " + (Math.floor(wCooldown / 50) + 1), 250, 250);
             //scene.drawtext("Score: " + score, 250, 275);
-            document.getElementById('score').innerHTML = "Next Wave: " + (Math.floor(wCooldown / 50) + 1);
-            document.getElementById('wave').innerHTML = "Score: " + score;
+            document.getElementById('score').innerHTML = "Next Wave: " + (Math.floor(wCooldown / 50) + 1 + " || Current Wave: " + waveCounter);
+            document.getElementById('wave').innerHTML = "Score: " + score + " || Zombie Amount: " + Math.floor(zAmount);
         }
 
         function renderZombies(value, index, array){
