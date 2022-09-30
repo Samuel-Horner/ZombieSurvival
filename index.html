@@ -97,13 +97,14 @@
                 if (this.y > player.y){this.y -= 1;}
                 if (this.y < player.y){this.y += 1;}
                 /*
-                for (i = 0; i < zombies.length; ++i){
+                for (i = 0; i < zombies.length; i++){
                     if(zombies[i] != false){
                         if(boxCollider(this.move, 30, 30, zombies[i], 30, 30)){this.move = new Vec2(0,0);console.log(true)}
                     }
                     //if(this.y + this.move.y >= zombies[i] && this.y + this.move.y <= zombies[i] + 30){this.move.y = 0;}
                 }
                 */
+                
                 this.move.x *= Math.random();
                 this.move.y *= Math.random();
 
@@ -112,6 +113,7 @@
 
                 if ((atkCooldown >= 20) && boxCollider(this, 30, 30, sword, 90, 90)){
                     zombies[index] = false;
+                    //zombies.splice(index, 1)
                     score += 1;
                 }
                 if (((this.x >= player.x && this.x <= player.x + 30) && (this.y >= player.y && this.y <= player.y + 30))||((this.x + 30 >= player.x && this.x + 30 <= player.x + 30) && (this.y + 30 >= player.y && this.y + 30 <= player.y + 30))){scene.gameOver();}
@@ -171,7 +173,9 @@
                 wCooldown = clamp(oWCooldown * 1.25, 0, 500);
                 oWCooldown = wCooldown
                 spawnZombie(Math.floor(zAmount));
-                zAmount += 0.1 * zAmount ^ 2;
+                //zAmount += 0.1 * zAmount ^ 2;
+                zAmount *= 1.75;
+                if(zAmount >= 400.0){zAmount = 400.0;}
             }
 
             console.log(zAmount);
