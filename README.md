@@ -1,4 +1,4 @@
 # ZombieSurvival
 A little game I made to test js  
 Play here:
-[ZombieSurvival](https://a3therium.github.io/ZombieSurvival/)
+[ZombieSurvival](https://samuel-horner.github.io/ZombieSurvival/)
